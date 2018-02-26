@@ -86,7 +86,8 @@ methods = [
     "SGD",
     "Momentum",
     "Nesterov",
-    "AdaGrad"
+    "AdaGrad",
+    "RMSProp"
 ]
 
 def stochasticGradientDescent(function, x0, y0, learning_rate, num_steps):
@@ -193,15 +194,44 @@ def adaGradUpdate(function, x0, y0, learning_rate, num_steps):
 
     return np.array([allX, allY])
 
+def rmsPropUpdate(function, x0, y0, learning_rate, num_steps, decay_rate = 0.9):
+    allX = [x0]
+    allY = [y0]
+
+    x = x0
+    y = y0
+
+    x_cache = 0
+    y_cache = 0
+
+    for _ in range(num_steps):
+
+        dz_dx = grad(function, argnum=0)(x, y)
+        dz_dy = grad(function, argnum=1)(x, y)
+
+        x_cache = decay_rate * x_cache + (1 - decay_rate) * dz_dx**2
+        x = x - learning_rate * dz_dx / (np.sqrt(x_cache) + 1e-7)
+        
+        y_cache = decay_rate * y_cache + (1 - decay_rate) * dz_dy**2
+        y = y - learning_rate * dz_dy / (np.sqrt(y_cache) + 1e-7)
+
+        allX.append(x)
+        allY.append(y)
+
+    return np.array([allX, allY])
+
 
 learning_rate = 0.005
 num_steps = 100
 sgdPath = stochasticGradientDescent(f, x0[0], x0[1], learning_rate, num_steps)
 momentumPath =  momentumUpdate(f, x0[0], x0[1], learning_rate, num_steps)
 nesterovPath = nesterovMomentumUpdate(f, x0[0], x0[1], learning_rate, num_steps)
-adaGrad = adaGradUpdate(f, x0[0], x0[1], 0.5, num_steps)
 
-paths = [sgdPath, momentumPath, nesterovPath, adaGrad]
+#These ones need different learning rates or they perform poorly...
+adaGrad = adaGradUpdate(f, x0[0], x0[1], 0.5, num_steps)
+rmsProp = rmsPropUpdate(f, x0[0], x0[1], 0.05, num_steps)
+
+paths = [sgdPath, momentumPath, nesterovPath, adaGrad, rmsProp]
 
 fig, ax = plt.subplots(figsize=(10, 6))
 
