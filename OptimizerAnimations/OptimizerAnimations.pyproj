@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>04c68efa-2078-4df2-a816-0d3db5d31327</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>2DContourPlotWithGradientField.py</StartupFile>
+    <StartupFile>Animation.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Animation.py" />
     <Compile Include="2DContourPlotWithGradientField.py" />
     <Compile Include="3DSurfacePlot.py" />
   </ItemGroup>
