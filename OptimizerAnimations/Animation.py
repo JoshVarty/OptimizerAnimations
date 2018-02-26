@@ -84,7 +84,8 @@ class TrajectoryAnimation(animation.FuncAnimation):
 
 methods = [
     "SGD",
-    "Momentum"
+    "Momentum",
+    "Nesterov"
 ]
 
 def stochasticGradientDescent(function, x0, y0, learning_rate, num_steps):
@@ -110,7 +111,6 @@ def stochasticGradientDescent(function, x0, y0, learning_rate, num_steps):
 
 def momentumUpdate(function, x0, y0, learning_rate, num_steps, momentum = 0.9):
 
-
     allX = [x0]
     allY = [y0]
 
@@ -125,8 +125,8 @@ def momentumUpdate(function, x0, y0, learning_rate, num_steps, momentum = 0.9):
         dz_dx = grad(function, argnum=0)(x, y)
         dz_dy = grad(function, argnum=1)(x, y)
         
-        x_v = (momentum * x_v) - (dz_dx) * learning_rate
-        y_v = (momentum * y_v) - (dz_dy) * learning_rate
+        x_v = (momentum * x_v) - (dz_dx * learning_rate)
+        y_v = (momentum * y_v) - (dz_dy * learning_rate)
 
         x = x + x_v
         y = y + y_v
@@ -136,11 +136,41 @@ def momentumUpdate(function, x0, y0, learning_rate, num_steps, momentum = 0.9):
 
     return np.array([allX, allY])
 
+def nesterovMomentumUpdate(function, x0, y0, learning_rate, num_steps, momentum = 0.9,):
+    allX = [x0]
+    allY = [y0]
+
+    x = x0
+    y = y0
+    
+    x_v= 0
+    x_v_prev = 0
+    y_v = 0
+    y_v_prev = 0
+
+    for _ in range(num_steps):
+        
+        dz_dx = grad(function, argnum=0)(x, y)
+        dz_dy = grad(function, argnum=1)(x, y)
+
+        x_v_prev = x_v
+        x_v = (momentum * x_v) - (dz_dx * learning_rate)
+        x = x  - momentum * x_v_prev + (1 + momentum) * x_v
+
+        y_v_prev = y_v
+        y_v = (momentum * y_v) - (dz_dy * learning_rate)
+        y = y - momentum * y_v_prev + (1 + momentum) * y_v
+
+        allX.append(x)
+        allY.append(y)
+
+    return np.array([allX, allY])
 
 sgdPath = stochasticGradientDescent(f, x0[0], x0[1], 0.005, 100)
 momentumPath =  momentumUpdate(f, x0[0], x0[1], 0.005, 100)
+nesterovPath = nesterovMomentumUpdate(f, x0[0], x0[1], 0.005, 100)
 
-paths = [sgdPath, momentumPath]
+paths = [sgdPath, momentumPath, nesterovPath]
 
 fig, ax = plt.subplots(figsize=(10, 6))
 
