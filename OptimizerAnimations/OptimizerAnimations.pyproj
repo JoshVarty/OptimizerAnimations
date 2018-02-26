@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>04c68efa-2078-4df2-a816-0d3db5d31327</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>3D_SurfacePlot.py</StartupFile>
+    <StartupFile>2DContourPlotWithGradientField.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,7 +22,8 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="3D_SurfacePlot.py" />
+    <Compile Include="2DContourPlotWithGradientField.py" />
+    <Compile Include="3DSurfacePlot.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|VisualStudio|Josh" />
