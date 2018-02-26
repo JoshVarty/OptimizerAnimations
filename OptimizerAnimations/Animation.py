@@ -85,7 +85,8 @@ class TrajectoryAnimation(animation.FuncAnimation):
 methods = [
     "SGD",
     "Momentum",
-    "Nesterov"
+    "Nesterov",
+    "AdaGrad"
 ]
 
 def stochasticGradientDescent(function, x0, y0, learning_rate, num_steps):
@@ -136,7 +137,7 @@ def momentumUpdate(function, x0, y0, learning_rate, num_steps, momentum = 0.9):
 
     return np.array([allX, allY])
 
-def nesterovMomentumUpdate(function, x0, y0, learning_rate, num_steps, momentum = 0.9,):
+def nesterovMomentumUpdate(function, x0, y0, learning_rate, num_steps, momentum = 0.9):
     allX = [x0]
     allY = [y0]
 
@@ -166,14 +167,41 @@ def nesterovMomentumUpdate(function, x0, y0, learning_rate, num_steps, momentum 
 
     return np.array([allX, allY])
 
+def adaGradUpdate(function, x0, y0, learning_rate, num_steps):
+    allX = [x0]
+    allY = [y0]
+
+    x = x0
+    y = y0
+
+    x_cache = 0
+    y_cache = 0
+
+    for _ in range(num_steps):
+
+        dz_dx = grad(function, argnum=0)(x, y)
+        dz_dy = grad(function, argnum=1)(x, y)
+
+        x_cache = x_cache + dz_dx ** 2
+        x = x - learning_rate * dz_dx / (np.sqrt(x_cache) + 1e-7)
+        
+        y_cache = y_cache + dz_dy ** 2
+        y = y - learning_rate * dz_dy / (np.sqrt(y_cache) + 1e-7)
+
+        allX.append(x)
+        allY.append(y)
+
+    return np.array([allX, allY])
+
 
 learning_rate = 0.005
 num_steps = 100
 sgdPath = stochasticGradientDescent(f, x0[0], x0[1], learning_rate, num_steps)
 momentumPath =  momentumUpdate(f, x0[0], x0[1], learning_rate, num_steps)
 nesterovPath = nesterovMomentumUpdate(f, x0[0], x0[1], learning_rate, num_steps)
+adaGrad = adaGradUpdate(f, x0[0], x0[1], 0.5, num_steps)
 
-paths = [sgdPath, momentumPath, nesterovPath]
+paths = [sgdPath, momentumPath, nesterovPath, adaGrad]
 
 fig, ax = plt.subplots(figsize=(10, 6))
 
