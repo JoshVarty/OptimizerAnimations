@@ -83,7 +83,8 @@ class TrajectoryAnimation(animation.FuncAnimation):
 
 
 methods = [
-    "SGD"
+    "SGD",
+    "Momentum"
 ]
 
 def stochasticGradientDescent(function, x0, y0, learning_rate, num_steps):
@@ -107,8 +108,39 @@ def stochasticGradientDescent(function, x0, y0, learning_rate, num_steps):
 
     return np.array([allX, allY])
 
-newPath = stochasticGradientDescent(f, x0[0], x0[1], 0.005, 100)
-paths = [newPath]
+def momentumUpdate(function, x0, y0, learning_rate, num_steps, momentum = 0.9):
+
+
+    allX = [x0]
+    allY = [y0]
+
+    x = x0
+    y = y0
+    
+    x_v = 0
+    y_v = 0
+
+    for _ in range(num_steps):
+        
+        dz_dx = grad(function, argnum=0)(x, y)
+        dz_dy = grad(function, argnum=1)(x, y)
+        
+        x_v = (momentum * x_v) - (dz_dx) * learning_rate
+        y_v = (momentum * y_v) - (dz_dy) * learning_rate
+
+        x = x + x_v
+        y = y + y_v
+
+        allX.append(x)
+        allY.append(y)
+
+    return np.array([allX, allY])
+
+
+sgdPath = stochasticGradientDescent(f, x0[0], x0[1], 0.005, 100)
+momentumPath =  momentumUpdate(f, x0[0], x0[1], 0.005, 100)
+
+paths = [sgdPath, momentumPath]
 
 fig, ax = plt.subplots(figsize=(10, 6))
 
