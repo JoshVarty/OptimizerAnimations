@@ -166,9 +166,12 @@ def nesterovMomentumUpdate(function, x0, y0, learning_rate, num_steps, momentum 
 
     return np.array([allX, allY])
 
-sgdPath = stochasticGradientDescent(f, x0[0], x0[1], 0.005, 100)
-momentumPath =  momentumUpdate(f, x0[0], x0[1], 0.005, 100)
-nesterovPath = nesterovMomentumUpdate(f, x0[0], x0[1], 0.005, 100)
+
+learning_rate = 0.005
+num_steps = 100
+sgdPath = stochasticGradientDescent(f, x0[0], x0[1], learning_rate, num_steps)
+momentumPath =  momentumUpdate(f, x0[0], x0[1], learning_rate, num_steps)
+nesterovPath = nesterovMomentumUpdate(f, x0[0], x0[1], learning_rate, num_steps)
 
 paths = [sgdPath, momentumPath, nesterovPath]
 
