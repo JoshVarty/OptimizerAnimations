@@ -14,8 +14,8 @@ from itertools import zip_longest
 from functools import partial
 
 f  = lambda x, y: (1.5 - x + x*y)**2 + (2.25 - x + x*y**2)**2 + (2.625 - x + x*y**3)**2
-xmin, xmax, xstep = -4.5, 4.5, .2
-ymin, ymax, ystep = -4.5, 4.5, .2
+xmin, xmax, xstep = -4.5, 4.5, .01
+ymin, ymax, ystep = -4.5, 4.5, .01
 
 x, y = np.meshgrid(np.arange(xmin, xmax + xstep, xstep), np.arange(ymin, ymax + ystep, ystep))
 z = f(x, y)
@@ -24,7 +24,7 @@ z = f(x, y)
 minima = np.array([3., .5])
 minima_ = minima.reshape(-1, 1)
 
-x0 = np.array([1., 1.])
+x0 = np.array([0., 1.])
 
 def make_minimize_cb(path=[]):
     
@@ -87,7 +87,8 @@ methods = [
     "Momentum",
     "Nesterov",
     "AdaGrad",
-    "RMSProp"
+    "RMSProp",
+    "Adam"
 ]
 
 def stochasticGradientDescent(function, x0, y0, learning_rate, num_steps):
@@ -221,6 +222,40 @@ def rmsPropUpdate(function, x0, y0, learning_rate, num_steps, decay_rate = 0.9):
     return np.array([allX, allY])
 
 
+def adamUpdate(function, x0, y0, learning_rate, num_steps, beta1, beta2):
+    allX = [x0]
+    allY = [y0]
+
+    x = x0
+    y = y0
+
+    m_x = 0
+    m_y = 0
+    x_v = 0
+    y_v = 0
+
+    #We need 1-indexed steps
+    for step in range(1, num_steps + 1):
+        dz_dx = grad(function, argnum=0)(x, y)
+        dz_dy = grad(function, argnum=1)(x, y)
+
+        m_x = beta1 * m_x + (1 - beta1)  * dz_dx
+        m_step_x = m_x / (1-beta1**step)
+        x_v = beta2 * x_v + (1 - beta2) * (dz_dx ** 2)
+        v_step_x = x_v / (1 - beta2 ** step)
+        x = x - learning_rate * m_step_x / (np.sqrt(v_step_x) + 1e-7)
+        
+        m_y = beta1 * m_y + (1 - beta1)  * dz_dy
+        m_step_y = m_y / (1-beta1**step)
+        y_v = beta2 * y_v + (1 - beta2) * (dz_dy ** 2)
+        v_step_y = y_v / (1 - beta2 ** step)
+        y = y - learning_rate * m_step_y / (np.sqrt(v_step_y) + 1e-7)
+
+        allX.append(x)
+        allY.append(y)
+
+    return np.array([allX, allY])
+
 learning_rate = 0.005
 num_steps = 100
 sgdPath = stochasticGradientDescent(f, x0[0], x0[1], learning_rate, num_steps)
@@ -230,8 +265,9 @@ nesterovPath = nesterovMomentumUpdate(f, x0[0], x0[1], learning_rate, num_steps)
 #These ones need different learning rates or they perform poorly...
 adaGrad = adaGradUpdate(f, x0[0], x0[1], 0.5, num_steps)
 rmsProp = rmsPropUpdate(f, x0[0], x0[1], 0.05, num_steps)
+adam = adamUpdate(f, x0[0], x0[1], 0.1, num_steps, 0.9, 0.999)
 
-paths = [sgdPath, momentumPath, nesterovPath, adaGrad, rmsProp]
+paths = [sgdPath, momentumPath, nesterovPath, adaGrad, rmsProp, adam]
 
 fig, ax = plt.subplots(figsize=(10, 6))
 
