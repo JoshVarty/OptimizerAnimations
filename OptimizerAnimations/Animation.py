@@ -24,7 +24,7 @@ z = f(x, y)
 minima = np.array([3., .5])
 minima_ = minima.reshape(-1, 1)
 
-x0 = np.array([0., 1.])
+x0 = np.array([1., 1.5])
 
 def make_minimize_cb(path=[]):
     
